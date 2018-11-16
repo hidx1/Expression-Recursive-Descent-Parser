@@ -22,8 +22,9 @@ char peek();
 
 int main()
 {
+	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
 	double hasil = Expression();
-	printf("%f\n",hasil);
+	printf("Hasil = %f\n",hasil);
 	return 0;
 }
 
@@ -46,6 +47,11 @@ boolean isPlusMin(char karakter)
 boolean isTimesDiv(char karakter)
 {
 	return (karakter == '*') || (karakter == '/');
+}
+
+boolean isPow(char karakter)
+{
+	return (karakter == '^');
 }
 
 int isInteger(float value)
@@ -98,8 +104,15 @@ double Term()
         if (operator == '*')
             termVal *= nextFactor;
         else
-        	termVal /= nextFactor;
+        	  termVal /= nextFactor;
     }
+		while(isPow(peek()))
+		{
+			char operator = getchar();
+			double nextFactor = Factor();
+			if(operator == '^')
+			    termVal = pow(termVal, nextFactor);
+		}
     return termVal;
 }
 
