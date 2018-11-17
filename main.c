@@ -19,7 +19,7 @@ double Factor();
 double Real();
 char peek();
 
-
+double pangkat();
 int main()
 {
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
@@ -106,12 +106,9 @@ double Term()
         else
         	  termVal /= nextFactor;
     }
-		while(isPow(peek()))
-		{
-			char operator = getchar();
-			double nextFactor = Factor();
-			if(operator == '^')
-			    termVal = pow(termVal, nextFactor);
+		while(isPow(peek())){
+			boolean first = true;
+			termVal = pangkat(termVal, &first);
 		}
     return termVal;
 }
@@ -164,6 +161,30 @@ double Real()
 		}
 	}
 	return realVal;
+}
+
+double pangkat(double first_number, boolean * first)
+{
+	double base;
+	if(*first)
+	{
+		base = first_number;
+		*first = false;
+	}
+	else
+	{
+		base = Factor();
+	}
+	while(isPow(peek()))
+	{
+		char operator = getchar();
+		double hasilNext = pangkat(first_number, first);
+		if(operator == '^')
+		{
+			base = pow(base, hasilNext);
+		}
+	}
+	return base;
 }
 
 char peek()
