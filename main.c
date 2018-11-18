@@ -14,7 +14,7 @@ int digit (char karakter);
 boolean isDigit(char karakter);
 boolean isPlusMin(char karakter);
 boolean isTimesDiv(char karakter);
-double Expression();
+double Expression(char charDepan);
 double Term();
 double Factor();
 double Real();
@@ -24,8 +24,10 @@ char peek();
 
 int main()
 {
+	// ungetc('',stdin);
+	// printf("%c",getchar());
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
-	double hasil = Expression();
+	double hasil = Expression('f');
 	printf("Hasil = %.20f\n",hasil);
 	return 0;
 }
@@ -67,7 +69,7 @@ boolean isOperator(char karakter)
 }
 
 // Expression := [ "-" ] Term { ("+" | "-") Term }
-double Expression()
+double Expression(char charDepan)
 {
 	double exprValue;
     char nextChar = peek();
@@ -97,9 +99,9 @@ double Expression()
     		exprValue += nextTermValue;
     	}
     }
-	if (!isOperator(peek()) && peek()!='\n')
+	if (charDepan=='f' && peek()!='\n')
 	{
-		printf("SYNTAX ERROR! Expected operator, instead got: %c",peek());
+		printf("SYNTAX ERROR!\n");
 		exit(-1);
 	}
     return exprValue;
@@ -112,7 +114,7 @@ double Term()
     while (isTimesDiv(peek()))
     {
         char operator = getchar();
-        double nextFactor = Factor();
+        double nextFactor = Pangkat();
         if (operator == '*')
 		{
 			termVal *= nextFactor;
@@ -155,11 +157,11 @@ double Factor()
 	double factorVal;
 	boolean isNegative=false;
 	// printf("%c\n",peek());
-	if ((peek())=='-')
-	{
-		isNegative=true;
-		getchar();
-	}
+	// if ((peek())=='-')
+	// {
+	// 	isNegative=true;
+	// 	getchar();
+	// }
 	if (isDigit(peek()))
 	{
 		factorVal = Real();
@@ -172,7 +174,7 @@ double Factor()
 			exit(-1);
 		}
 		getchar();
-		factorVal=Expression();
+		factorVal=Expression('(');
 		if (peek()!=')')
 		{
 			printf("SYNTAX ERROR! Expected ), instead got: %c",peek());
@@ -183,10 +185,10 @@ double Factor()
 			getchar();
 		}
 	}
-	if (isNegative)
-	{
-		factorVal*=-1;
-	}
+	// if (isNegative)
+	// {
+	// 	factorVal*=-1;
+	// }
 	return factorVal;
 }
 
