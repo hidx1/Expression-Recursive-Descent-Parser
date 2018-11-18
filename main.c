@@ -17,9 +17,10 @@ double Expression();
 double Term();
 double Factor();
 double Real();
+double Pangkat();
 char peek();
 
-double pangkat();
+
 int main()
 {
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
@@ -108,7 +109,7 @@ double Term()
     }
 		while(isPow(peek())){
 			boolean first = true;
-			termVal = pangkat(termVal, &first);
+			termVal = Pangkat(termVal, &first);
 		}
     return termVal;
 }
@@ -163,7 +164,7 @@ double Real()
 	return realVal;
 }
 
-double pangkat(double first_number, boolean * first)
+double Pangkat(double first_number, boolean * first)
 {
 	double base;
 	if(*first)
@@ -178,7 +179,7 @@ double pangkat(double first_number, boolean * first)
 	while(isPow(peek()))
 	{
 		char operator = getchar();
-		double hasilNext = pangkat(first_number, first);
+		double hasilNext = Pangkat(first_number, first);
 		if(operator == '^')
 		{
 			base = pow(base, hasilNext);
