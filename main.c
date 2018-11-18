@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <math.h>
 #include "boolean.h"
+#include <float.h>
 
 int digit (char karakter);
 boolean isDigit(char karakter);
