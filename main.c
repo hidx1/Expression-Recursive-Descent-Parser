@@ -107,17 +107,32 @@ double Term()
         else
         	  termVal /= nextFactor;
     }
-		while(isPow(peek())){
-			boolean first = true;
-			termVal = Pangkat(termVal, &first);
-		}
+
+	while(isPow(peek()))
+	{
+		boolean first = true;
+		termVal = Pangkat(termVal, &first);
+	}
+
+	if (!(isPlusMin(peek())) && peek()!='\n')
+	{
+		printf("Expected operator, instead got: %c",peek());
+		exit(-1);
+	}
     return termVal;
 }
 
-// Factor     := RealNumber | "(" Expression ")"
+// Factor     := {-} RealNumber | "(" Expression ")"
 double Factor()
 {
 	double factorVal;
+	boolean isNegative=false;
+	// printf("%c\n",peek());
+	if ((peek())=='-')
+	{
+		isNegative=true;
+		getchar();
+	}
 	if (isDigit(peek()))
 	{
 		factorVal = Real();
@@ -140,6 +155,10 @@ double Factor()
 		{
 			getchar();
 		}
+	}
+	if (isNegative)
+	{
+		factorVal*=-1;
 	}
 	return factorVal;
 }
