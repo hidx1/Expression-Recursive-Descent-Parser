@@ -12,24 +12,25 @@
 #include "boolean.h"
 #include <float.h>
 
+#define round8(var) ((round(var * 100000000))/100000000)
+#define printf __mingw_printf
+
 int digit (char karakter);
 boolean isDigit(char karakter);
 boolean isPlusMin(char karakter);
 boolean isTimesDiv(char karakter);
-double Expression(char charDepan);
-double Term();
-double Factor();
-double Real();
-double Pangkat();
+long double Expression(char charDepan);
+long double Term();
+long double Factor();
+long double Real();
+long double Pangkat();
 char peek();
 
 
 int main()
 {
-	// ungetc('',stdin);
-	// printf("%c",getchar());
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
-	double hasil = Expression('f');
+	long double hasil = Expression('f');
 	if(hasil < -FLT_MAX || hasil > FLT_MAX)
 	{
 		printf("MATH ERROR\n");
@@ -40,8 +41,9 @@ int main()
 	}
 	else
 	{
-		printf("Hasil = %.20f\n",hasil);
+		printf("Hasil = %.20Lf\n",hasil);
 	}
+	// mpf_clear(hasilmp);
 	return 0;
 }
 
@@ -71,20 +73,15 @@ boolean isPow(char karakter)
 	return (karakter == '^');
 }
 
-int isInteger(float value)
-{
-	return(abs(round(value)-value) < 0.000001);
-}
-
 boolean isOperator(char karakter)
 {
 	return (isPlusMin(karakter) || isTimesDiv(karakter) || karakter=='^');
 }
 
 // Expression := [ "-" ] Term { ("+" | "-") Term }
-double Expression(char charDepan)
+long double Expression(char charDepan)
 {
-	double exprValue;
+	long double exprValue;
     char nextChar = peek();
     boolean isNegative = false;
     if (nextChar == '-')	//consume
@@ -101,7 +98,7 @@ double Expression(char charDepan)
     {
     	char operator = getchar();
     	// printf("%c\n",getchar());
-    	double nextTermValue = Term();
+    	long double nextTermValue = Term();
     	// printf("%f\n",nextTermValue);
     	if (operator == '-')
     	{
@@ -114,20 +111,20 @@ double Expression(char charDepan)
     }
 	if (charDepan=='f' && peek()!='\n')
 	{
-		printf("SYNTAX ERROR!\n");
+		printf("SYNTAX ERROR! Unexpected char!\n");
 		exit(-1);
 	}
-    return exprValue;
+    return round8(exprValue);
 }
 
 // Term := Pangkat { ( "*" | "/" ) Pangkat }
-double Term()
+long double Term()
 {
-    double termVal = Pangkat();
+    long double termVal = Pangkat();
     while (isTimesDiv(peek()))
     {
         char operator = getchar();
-        double nextFactor = Pangkat();
+        long double nextFactor = Pangkat();
         if (operator == '*')
 		{
 			termVal *= nextFactor;
@@ -145,36 +142,29 @@ double Term()
 			}
 		}	
     }
-    return termVal;
+    return round8(termVal);
 }
 
 //Pangka		:= Factor { ( "^" ) Factor}
-double Pangkat()
+long double Pangkat()
 {
-	double base = Factor();
+	long double base = Factor();
 	while(isPow(peek()))
 	{
 		char operator = getchar();
-		double hasilNext = Pangkat();
+		long double hasilNext = Pangkat();
 		if(operator == '^')
 		{
 			base = pow(base, hasilNext);
 		}
 	}
-	return base;
+	return round8(base);
 }
 
-// Factor     := {-} RealNumber | "(" Expression ")"
-double Factor()
+// Factor     := RealNumber | "(" Expression ")"
+long double Factor()
 {
-	double factorVal;
-	boolean isNegative=false;
-	// printf("%c\n",peek());
-	// if ((peek())=='-')
-	// {
-	// 	isNegative=true;
-	// 	getchar();
-	// }
+	long double factorVal;
 	if (isDigit(peek()))
 	{
 		factorVal = Real();
@@ -198,22 +188,15 @@ double Factor()
 			getchar();
 		}
 	}
-	// if (isNegative)
-	// {
-	// 	factorVal*=-1;
-	// }
-	return factorVal;
+	return round8(factorVal);
 }
 
-double Real()
+long double Real()
 {
-	double realVal=0.0;
+	long double realVal=0.0;
 	while (isDigit(peek()))
 	{
-		int a = digit(getchar());
-		realVal = realVal * 10 + (double) a;
-		// printf("%.20Lf aa\n",(double) a);
-		// printf("%.20Lf\n",realVal);
+		realVal = realVal * 10 + digit(getchar());
 	}
 	int power = 1;
 	if (peek()=='.')
@@ -225,7 +208,7 @@ double Real()
 			power++;
 		}
 	}
-	return realVal;
+	return round8(realVal);
 }
 
 char peek()
