@@ -28,7 +28,18 @@ int main()
 	// printf("%c",getchar());
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
 	double hasil = Expression('f');
-	printf("Hasil = %.20f\n",hasil);
+	if(hasil < -FLT_MAX || hasil > FLT_MAX)
+	{
+		printf("MATH ERROR\n");
+	}
+	else if (hasil != hasil)
+	{
+		printf("MATH ERROR\n");
+	}
+	else
+	{
+		printf("Hasil = %.20f\n",hasil);
+	}
 	return 0;
 }
 
