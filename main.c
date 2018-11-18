@@ -3,6 +3,7 @@
 // Factor     := RealNumber | "(" Expression ")"
 // RealNumber := Digit{Digit} | [Digit] "." {Digit}
 // Digit      := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -25,7 +26,7 @@ int main()
 {
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): ");
 	double hasil = Expression();
-	printf("Hasil = %f\n",hasil);
+	printf("Hasil = %.20f\n",hasil);
 	return 0;
 }
 
@@ -60,6 +61,11 @@ int isInteger(float value)
 	return(abs(round(value)-value) < 0.000001);
 }
 
+boolean isOperator(char karakter)
+{
+	return (isPlusMin(karakter) || isTimesDiv(karakter) || karakter=='^');
+}
+
 // Expression := [ "-" ] Term { ("+" | "-") Term }
 double Expression()
 {
@@ -91,35 +97,56 @@ double Expression()
     		exprValue += nextTermValue;
     	}
     }
+	if (!isOperator(peek()) && peek()!='\n')
+	{
+		printf("SYNTAX ERROR! Expected operator, instead got: %c",peek());
+		exit(-1);
+	}
     return exprValue;
 }
 
-// Term := Factor { ( "*" | "/" ) Factor }
+// Term := Pangkat { ( "*" | "/" ) Pangkat }
 double Term()
 {
-    double termVal = Factor();
+    double termVal = Pangkat();
     while (isTimesDiv(peek()))
     {
         char operator = getchar();
         double nextFactor = Factor();
         if (operator == '*')
-            termVal *= nextFactor;
+		{
+			termVal *= nextFactor;
+		}
         else
-        	  termVal /= nextFactor;
+		{
+			if (nextFactor==0)
+			{
+				printf("Math error, division by zero!");
+				exit(-1);
+			}
+			else
+			{
+				termVal /= nextFactor;
+			}
+		}	
     }
+    return termVal;
+}
 
+//Pangka		:= Factor { ( "^" ) Factor}
+double Pangkat()
+{
+	double base = Factor();
 	while(isPow(peek()))
 	{
-		boolean first = true;
-		termVal = Pangkat(termVal, &first);
+		char operator = getchar();
+		double hasilNext = Pangkat();
+		if(operator == '^')
+		{
+			base = pow(base, hasilNext);
+		}
 	}
-
-	if (!(isPlusMin(peek())) && peek()!='\n')
-	{
-		printf("Expected operator, instead got: %c",peek());
-		exit(-1);
-	}
-    return termVal;
+	return base;
 }
 
 // Factor     := {-} RealNumber | "(" Expression ")"
@@ -141,14 +168,14 @@ double Factor()
 	{
 		if (peek()!='(')
 		{
-			printf("Expected number or (, instead got: %c",peek());
+			printf("SYNTAX ERROR! Expected number or (, instead got: %c",peek());
 			exit(-1);
 		}
 		getchar();
 		factorVal=Expression();
 		if (peek()!=')')
 		{
-			printf("Expected ), instead got: %c",peek());
+			printf("SYNTAX ERROR! Expected ), instead got: %c",peek());
 			exit(-1);
 		}
 		else
@@ -165,10 +192,13 @@ double Factor()
 
 double Real()
 {
-	double realVal=0;
+	double realVal=0.0;
 	while (isDigit(peek()))
 	{
-		realVal= realVal * 10 + digit(getchar());
+		int a = digit(getchar());
+		realVal = realVal * 10 + (double) a;
+		// printf("%.20Lf aa\n",(double) a);
+		// printf("%.20Lf\n",realVal);
 	}
 	int power = 1;
 	if (peek()=='.')
@@ -181,30 +211,6 @@ double Real()
 		}
 	}
 	return realVal;
-}
-
-double Pangkat(double first_number, boolean * first)
-{
-	double base;
-	if(*first)
-	{
-		base = first_number;
-		*first = false;
-	}
-	else
-	{
-		base = Factor();
-	}
-	while(isPow(peek()))
-	{
-		char operator = getchar();
-		double hasilNext = Pangkat(first_number, first);
-		if(operator == '^')
-		{
-			base = pow(base, hasilNext);
-		}
-	}
-	return base;
 }
 
 char peek()
