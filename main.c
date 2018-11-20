@@ -1,10 +1,3 @@
-// Expression := [ "-" ] Term { ("+" | "-") Term }
-// Term       := Factor { ( "*" | "/" ) Factor }
-// Factor     := RealNumber | "(" Expression ")"
-// RealNumber := Digit{Digit} | [Digit] "." {Digit}
-// Pangkat		:= Factor { ( "^" ) Factor}
-// Digit      := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -13,8 +6,6 @@
 #include <unistd.h>
 #include "boolean.h"
 #include <complex.h>
-
-// #define printf __mingw_printf
 
 int digit (char karakter);
 boolean isDigit(char karakter);
@@ -25,29 +16,23 @@ long double complex Term();
 long double complex Factor();
 long double complex Bilangan();
 long double complex Pangkat();
-long double complex round8(long double complex input);
 char peek();
 
 
 int main()
 {
-	// system("@cls||clear");
-	// printf("  _____ ______ _____    _____      _            _       _             \n");
-	// printf(" / ____|  ____/ ____|  / ____|    | |          | |     | |            \n");
-	// sleep(1);
-	// printf("| |    | |__ | |  __  | |     __ _| | ___ _   _| | __ _| |_ ___  _ __ \n");
-	// printf("| |    |  __|| | |_ | | |    / _` | |/ __| | | | |/ _` | __/ _ \\| '__|\n");
-	// sleep(1);
-	// printf("| |____| |   | |__| | | |___| (_| | | (__| |_| | | (_| | || (_) | |   \n");
-	// printf(" \\_____|_|    \\_____|  \\_____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|   \n");
-	// sleep(1.5);
-	// printf("\n");
-	// double asal = 92233720368547758089 ;
-	// long double y ;
-	// scanf ("%Lf", &y ) ;
-	// printf("%Lf",y);
-	// printf("LDBL_MAX      = %Le\n", LDBL_MAX);
-	printf("Hasil = %.20Lf %+.20Lfi\n",creall(cpowl(-1,0.5)),cimagl(cpowl(-1,0.5)));
+	system("@cls||clear");
+	printf("  _____ ______ _____    _____      _            _       _             \n");
+	printf(" / ____|  ____/ ____|  / ____|    | |          | |     | |            \n");
+	sleep(1);
+	printf("| |    | |__ | |  __  | |     __ _| | ___ _   _| | __ _| |_ ___  _ __ \n");
+	printf("| |    |  __|| | |_ | | |    / _` | |/ __| | | | |/ _` | __/ _ \\| '__|\n");
+	sleep(1);
+	printf("| |____| |   | |__| | | |___| (_| | | (__| |_| | | (_| | || (_) | |   \n");
+	printf(" \\_____|_|    \\_____|  \\_____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|   \n");
+	sleep(1.5);
+	printf("\n");
+	
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): \n");
 	printf(">>> ");
 	long double complex hasil = Expression('f');
@@ -108,13 +93,13 @@ boolean isOperator(char karakter)
 	return (isPlusMin(karakter) || isTimesDiv(karakter) || isPow(karakter));
 }
 
-// Expression := [ "-" ] Term { ("+" | "-") Term }
+/* Expression : [ "-" ] Term < [ + | - ] Term > */
 long double complex Expression(char charDepan)
 {
 	long double complex exprValue;
     char nextChar = peek();
     boolean isNegative = false;
-    if (nextChar == '-')	//consume
+    if (nextChar == '-')	
     {
     	isNegative = true;
     	getchar();
@@ -134,9 +119,7 @@ long double complex Expression(char charDepan)
     while (isPlusMin(peek()))
     {
     	char operator = getchar();
-    	// printf("%c\n",getchar());
     	long double complex nextTermValue = Term();
-    	// printf("%f\n",nextTermValue);
     	if (operator == '-')
     	{
     		exprValue -= nextTermValue;
@@ -151,10 +134,10 @@ long double complex Expression(char charDepan)
 		printf("SYNTAX ERROR! Unexpected char!\n");
 		exit(-1);
 	}
-    return round8(exprValue);
+    return (exprValue);
 }
 
-// Term := Pangkat { ( "*" | "/" ) Pangkat }
+/* Term : Pangkat < [ * | / ] Pangkat > */
 long double complex Term()
 {
     long double complex termVal = Pangkat();
@@ -179,10 +162,10 @@ long double complex Term()
 			}
 		}
     }
-    return round8(termVal);
+    return (termVal);
 }
 
-//Pangka		:= Factor { ( "^" ) Factor}
+/* Pangkat:  Factor < [ ^ ] Factor > */
 long double complex Pangkat()
 {
 	long double complex base = Factor();
@@ -192,19 +175,13 @@ long double complex Pangkat()
 		long double complex hasilNext = Pangkat();
 		if(operator == '^')
 		{
-			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(base),cimagl(base));
-			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(hasilNext),cimagl(hasilNext));
-			base = -1 + 0*I;
-			// hasilNext = 0.5 + 0*I;
 			base = cpowl(base, hasilNext);
-			// base = cpowl(-1 , 0.8);
-			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(base),cimagl(base));
 		}
 	}
-	return round8(base);
+	return (base);
 }
 
-// Factor     := RealNumber | "(" Expression ")"
+/* Factor : Real | ( Expression ) */
 long double complex Factor()
 {
 	long double complex factorVal;
@@ -231,11 +208,10 @@ long double complex Factor()
 			getchar();
 		}
 	}
-	// printf("%.20Lfaa\n",cimagl(factorVal));
-	return round8(factorVal);
+	return (factorVal);
 }
-// 9999999999999999999
 
+/* Bilangan : Digit.Digit | Digit | Digit i | i */
 long double complex Bilangan()
 {
 	long double complex totalVal=0 + 0 * I;
@@ -245,7 +221,6 @@ long double complex Bilangan()
 		while (isDigit(peek()))
 		{
 			realVal = realVal * 10 + (long double complex) digit(getchar());
-			// printf("%.20Lfcc\n",creall(realVal));
 		}
 		int power = 1;
 		if (peek()=='.')
@@ -257,14 +232,10 @@ long double complex Bilangan()
 				power++;
 			}
 		}
-		// printf("%c\n",peek());
 		if (peek()=='i')
 		{
-			// printf("masuk\n");
 			getchar();
-			// printf("%.20Lfaa\n",creall(realVal));
 			totalVal = realVal * I;
-			// printf("%.20Lfbb\n",cimagl(totalVal));
 		}
 		else
 		{
@@ -276,13 +247,7 @@ long double complex Bilangan()
 		getchar();
 		totalVal = 1 * I;
 	}
-	// printf("%.20Lfbb\n",creall(totalVal));
-	return round8(totalVal);
-}
-long double complex round8(long double complex input)
-{
-	// return ((round(creall(input) * 100000000))/100000000) + ((round(cimagl(input) * 100000000))/100000000)*I;
-	return (input);
+	return (totalVal);
 }
 
 char peek()
