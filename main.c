@@ -178,7 +178,7 @@ long double complex Pangkat()
 long double complex Factor()
 {
 	long double complex factorVal;
-	if (isDigit(peek()))
+	if (isDigit(peek()) || peek()=='i')
 	{
 		factorVal = Bilangan();
 	}
@@ -209,32 +209,40 @@ long double complex Bilangan()
 {
 	long double complex totalVal=0 + 0 * I;
 	long double complex realVal=0 + 0 * I;
-	while (isDigit(peek()))
+	if (peek()!='i')
 	{
-		realVal = realVal * 10 + digit(getchar());
-	}
-	int power = 1;
-	if (peek()=='.')
-	{
-		getchar();
 		while (isDigit(peek()))
 		{
-			realVal += digit(getchar())/pow(10,power);
-			power++;
+			realVal = realVal * 10 + digit(getchar());
 		}
-	}
-	// printf("%c\n",peek());
-	if (peek()=='i')
-	{
-		// printf("masuk\n");
-		getchar();
-		
-		totalVal = realVal * I;
-		// printf("%.20Lf\n",cimag(totalVal));
+		int power = 1;
+		if (peek()=='.')
+		{
+			getchar();
+			while (isDigit(peek()))
+			{
+				realVal += digit(getchar())/pow(10,power);
+				power++;
+			}
+		}
+		// printf("%c\n",peek());
+		if (peek()=='i')
+		{
+			// printf("masuk\n");
+			getchar();
+			
+			totalVal = realVal * I;
+			// printf("%.20Lf\n",cimag(totalVal));
+		}
+		else
+		{
+			totalVal = realVal;
+		}
 	}
 	else
 	{
-		totalVal = realVal;
+		getchar();
+		totalVal = 1 * I;
 	}
 	return round8(totalVal);
 }
