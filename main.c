@@ -55,7 +55,10 @@ int main()
 	// }
 	// else
 	{
-		printf("Hasil = %.20Lf %+.20Lfi\n",creal(hasil),cimag(hasil));
+		if (abs(cimag(hasil)) <= 0.0000000001)
+			printf("Hasil = %.20Lf\n",creal(hasil));
+		else
+			printf("Hasil = %.20Lf %+.20Lfi\n",creal(hasil),cimag(hasil));
 	}
 	return 0;
 }
