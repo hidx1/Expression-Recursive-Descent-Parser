@@ -12,48 +12,50 @@
 #include <math.h>
 #include <unistd.h>
 #include "boolean.h"
+#include <complex.h>
 
-#define round8(var) ((round(var * 100000000))/100000000)
-#define printf __mingw_printf
+// #define round8(var) ((round(var * 100000000))/100000000)
+#define round8(var) (var)
+// #define printf __mingw_printf
 
 int digit (char karakter);
 boolean isDigit(char karakter);
 boolean isPlusMin(char karakter);
 boolean isTimesDiv(char karakter);
-long double Expression(char charDepan);
-long double Term();
-long double Factor();
-long double Real();
-long double Pangkat();
+long double complex Expression(char charDepan);
+long double complex Term();
+long double complex Factor();
+long double complex Bilangan();
+long double complex Pangkat();
 char peek();
 
 
 int main()
 {
-	system("@cls||clear");
-	printf("  _____ ______ _____    _____      _            _       _             \n");
-	printf(" / ____|  ____/ ____|  / ____|    | |          | |     | |            \n");
-	sleep(1);
-	printf("| |    | |__ | |  __  | |     __ _| | ___ _   _| | __ _| |_ ___  _ __ \n");
-	printf("| |    |  __|| | |_ | | |    / _` | |/ __| | | | |/ _` | __/ _ \\| '__|\n");
-	sleep(1);
-	printf("| |____| |   | |__| | | |___| (_| | | (__| |_| | | (_| | || (_) | |   \n");
-	printf(" \\_____|_|    \\_____|  \\_____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|   \n");
-	sleep(1.5);
-	printf("\n");
+	// system("@cls||clear");
+	// printf("  _____ ______ _____    _____      _            _       _             \n");
+	// printf(" / ____|  ____/ ____|  / ____|    | |          | |     | |            \n");
+	// sleep(1);
+	// printf("| |    | |__ | |  __  | |     __ _| | ___ _   _| | __ _| |_ ___  _ __ \n");
+	// printf("| |    |  __|| | |_ | | |    / _` | |/ __| | | | |/ _` | __/ _ \\| '__|\n");
+	// sleep(1);
+	// printf("| |____| |   | |__| | | |___| (_| | | (__| |_| | | (_| | || (_) | |   \n");
+	// printf(" \\_____|_|    \\_____|  \\_____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|   \n");
+	// sleep(1.5);
+	// printf("\n");
 
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): \n");
 	printf(">>> ");
-	double hasil = Expression('f');
-	if(hasil < -FLT_MAX || hasil > FLT_MAX)
-	{ //Jika hasil infinite
-		printf("MATH ERROR\n");
-	} else if (hasil != hasil){ //Jika hasil NaN
-		printf("MATH ERROR\n");
-	}
-	else
+	long double complex hasil = Expression('f');
+	// if(hasil < -FLT_MAX || hasil > FLT_MAX)
+	// { //Jika hasil infinite
+	// 	printf("MATH ERROR\n");
+	// } else if (hasil != hasil){ //Jika hasil NaN
+	// 	printf("MATH ERROR\n");
+	// }
+	// else
 	{
-		printf("Hasil = %.20Lf\n",hasil);
+		printf("Hasil = %.20Lf %+.20Lfi\n",creal(hasil),cimag(hasil));
 	}
 	return 0;
 }
@@ -90,9 +92,9 @@ boolean isOperator(char karakter)
 }
 
 // Expression := [ "-" ] Term { ("+" | "-") Term }
-long double Expression(char charDepan)
+long double complex Expression(char charDepan)
 {
-	long double exprValue;
+	long double complex exprValue;
     char nextChar = peek();
     boolean isNegative = false;
     if (nextChar == '-')	//consume
@@ -109,7 +111,7 @@ long double Expression(char charDepan)
     {
     	char operator = getchar();
     	// printf("%c\n",getchar());
-    	long double nextTermValue = Term();
+    	long double complex nextTermValue = Term();
     	// printf("%f\n",nextTermValue);
     	if (operator == '-')
     	{
@@ -129,13 +131,13 @@ long double Expression(char charDepan)
 }
 
 // Term := Pangkat { ( "*" | "/" ) Pangkat }
-long double Term()
+long double complex Term()
 {
-    long double termVal = Pangkat();
+    long double complex termVal = Pangkat();
     while (isTimesDiv(peek()))
     {
         char operator = getchar();
-        long double nextFactor = Pangkat();
+        long double complex nextFactor = Pangkat();
         if (operator == '*')
 		{
 			termVal *= nextFactor;
@@ -157,28 +159,28 @@ long double Term()
 }
 
 //Pangka		:= Factor { ( "^" ) Factor}
-long double Pangkat()
+long double complex Pangkat()
 {
-	long double base = Factor();
+	long double complex base = Factor();
 	while(isPow(peek()))
 	{
 		char operator = getchar();
-		long double hasilNext = Pangkat();
+		long double complex hasilNext = Pangkat();
 		if(operator == '^')
 		{
-			base = pow(base, hasilNext);
+			base = cpow(base, hasilNext);
 		}
 	}
 	return round8(base);
 }
 
 // Factor     := RealNumber | "(" Expression ")"
-long double Factor()
+long double complex Factor()
 {
-	long double factorVal;
+	long double complex factorVal;
 	if (isDigit(peek()))
 	{
-		factorVal = Real();
+		factorVal = Bilangan();
 	}
 	else
 	{
@@ -199,12 +201,14 @@ long double Factor()
 			getchar();
 		}
 	}
+	// printf("%.20Lfaa\n",cimag(factorVal));
 	return round8(factorVal);
 }
 
-long double Real()
+long double complex Bilangan()
 {
-	long double realVal=0.0;
+	long double complex totalVal=0 + 0 * I;
+	long double complex realVal=0 + 0 * I;
 	while (isDigit(peek()))
 	{
 		realVal = realVal * 10 + digit(getchar());
@@ -219,7 +223,20 @@ long double Real()
 			power++;
 		}
 	}
-	return round8(realVal);
+	// printf("%c\n",peek());
+	if (peek()=='i')
+	{
+		// printf("masuk\n");
+		getchar();
+		
+		totalVal = realVal * I;
+		// printf("%.20Lf\n",cimag(totalVal));
+	}
+	else
+	{
+		totalVal = realVal;
+	}
+	return round8(totalVal);
 }
 
 char peek()
