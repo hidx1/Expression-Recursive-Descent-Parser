@@ -47,6 +47,7 @@ int main()
 	// scanf ("%Lf", &y ) ;
 	// printf("%Lf",y);
 	// printf("LDBL_MAX      = %Le\n", LDBL_MAX);
+	printf("Hasil = %.20Lf %+.20Lfi\n",creall(cpowl(-1,0.5)),cimagl(cpowl(-1,0.5)));
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): \n");
 	printf(">>> ");
 	long double complex hasil = Expression('f');
@@ -60,9 +61,11 @@ int main()
 	}
 	else
 	{
-		if (abs(cimagl(hasil)) < 0.0000000001)
+		if (fabsl(cimagl(hasil)) < 0.0000000001)
+		{
 			printf("Hasil = %.20Lf\n",creall(hasil));
-		else if (abs(creall(hasil)) < 0.0000000001 && abs(cimagl(hasil)) >= 0.0000000001)
+		}	
+		else if (fabsl(creall(hasil)) < 0.0000000001 && fabsl(cimagl(hasil)) >= 0.0000000001)
 		{
 			printf("Hasil = %.20Lfi\n",cimagl(hasil));
 		}
@@ -119,7 +122,14 @@ long double complex Expression(char charDepan)
     exprValue = Term();
     if (isNegative)
     {
-    	exprValue *=-1;
+		if (cimagl(exprValue)==0)
+		{
+			exprValue = creall(exprValue)*-1;
+		}
+		else
+		{
+			exprValue *= -1;
+		}
     }
     while (isPlusMin(peek()))
     {
@@ -182,7 +192,13 @@ long double complex Pangkat()
 		long double complex hasilNext = Pangkat();
 		if(operator == '^')
 		{
+			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(base),cimagl(base));
+			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(hasilNext),cimagl(hasilNext));
+			base = -1 + 0*I;
+			// hasilNext = 0.5 + 0*I;
 			base = cpowl(base, hasilNext);
+			// base = cpowl(-1 , 0.8);
+			// printf("Hasil = %.20Lf %+.20Lfi\n",creall(base),cimagl(base));
 		}
 	}
 	return round8(base);
@@ -265,8 +281,8 @@ long double complex Bilangan()
 }
 long double complex round8(long double complex input)
 {
-	return ((round(creall(input) * 100000000))/100000000) + ((round(cimagl(input) * 100000000))/100000000)*I;
-	// return (input);
+	// return ((round(creall(input) * 100000000))/100000000) + ((round(cimagl(input) * 100000000))/100000000)*I;
+	return (input);
 }
 
 char peek()
