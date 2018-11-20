@@ -14,8 +14,6 @@
 #include "boolean.h"
 #include <complex.h>
 
-// #define round8(var) ((round(var * 100000000))/100000000)
-#define round8(var) (var)
 // #define printf __mingw_printf
 
 int digit (char karakter);
@@ -27,6 +25,7 @@ long double complex Term();
 long double complex Factor();
 long double complex Bilangan();
 long double complex Pangkat();
+long double complex round8(long double complex input);
 char peek();
 
 
@@ -43,22 +42,34 @@ int main()
 	// printf(" \\_____|_|    \\_____|  \\_____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|   \n");
 	// sleep(1.5);
 	// printf("\n");
-
+	// double asal = 92233720368547758089 ;
+	// long double y ;
+	// scanf ("%Lf", &y ) ;
+	// printf("%Lf",y);
+	// printf("LDBL_MAX      = %Le\n", LDBL_MAX);
 	printf("Masukkan kalkulasi yang ingin dilakukan (tanpa spasi): \n");
 	printf(">>> ");
 	long double complex hasil = Expression('f');
-	// if(hasil < -FLT_MAX || hasil > FLT_MAX)
-	// { //Jika hasil infinite
-	// 	printf("MATH ERROR\n");
-	// } else if (hasil != hasil){ //Jika hasil NaN
-	// 	printf("MATH ERROR\n");
-	// }
-	// else
+	
+	if(creall(hasil) < -LDBL_MAX || creall(hasil) > LDBL_MAX || cimagl(hasil) < -LDBL_MAX || cimagl(hasil) > LDBL_MAX)
+	{ //Jika hasil infinite
+		printf("MATH ERROR\n");
+	}
+	else if (hasil != hasil){ //Jika hasil NaN
+		printf("MATH ERROR\n");
+	}
+	else
 	{
-		if (abs(cimag(hasil)) <= 0.0000000001)
-			printf("Hasil = %.20Lf\n",creal(hasil));
+		if (abs(cimagl(hasil)) < 0.0000000001)
+			printf("Hasil = %.20Lf\n",creall(hasil));
+		else if (abs(creall(hasil)) < 0.0000000001 && abs(cimagl(hasil)) >= 0.0000000001)
+		{
+			printf("Hasil = %.20Lfi\n",cimagl(hasil));
+		}
 		else
-			printf("Hasil = %.20Lf %+.20Lfi\n",creal(hasil),cimag(hasil));
+		{
+			printf("Hasil = %.20Lf %+.20Lfi\n",creall(hasil),cimagl(hasil));
+		}	
 	}
 	return 0;
 }
@@ -171,7 +182,7 @@ long double complex Pangkat()
 		long double complex hasilNext = Pangkat();
 		if(operator == '^')
 		{
-			base = cpow(base, hasilNext);
+			base = cpowl(base, hasilNext);
 		}
 	}
 	return round8(base);
@@ -204,19 +215,21 @@ long double complex Factor()
 			getchar();
 		}
 	}
-	// printf("%.20Lfaa\n",cimag(factorVal));
+	// printf("%.20Lfaa\n",cimagl(factorVal));
 	return round8(factorVal);
 }
+// 9999999999999999999
 
 long double complex Bilangan()
 {
 	long double complex totalVal=0 + 0 * I;
-	long double complex realVal=0 + 0 * I;
+	long double complex realVal= (long double complex)(0 + 0 * I);
 	if (peek()!='i')
 	{
 		while (isDigit(peek()))
 		{
-			realVal = realVal * 10 + digit(getchar());
+			realVal = realVal * 10 + (long double complex) digit(getchar());
+			// printf("%.20Lfcc\n",creall(realVal));
 		}
 		int power = 1;
 		if (peek()=='.')
@@ -224,7 +237,7 @@ long double complex Bilangan()
 			getchar();
 			while (isDigit(peek()))
 			{
-				realVal += digit(getchar())/pow(10,power);
+				realVal += (long double complex) digit(getchar())/pow(10,power);
 				power++;
 			}
 		}
@@ -233,9 +246,9 @@ long double complex Bilangan()
 		{
 			// printf("masuk\n");
 			getchar();
-			
+			// printf("%.20Lfaa\n",creall(realVal));
 			totalVal = realVal * I;
-			// printf("%.20Lf\n",cimag(totalVal));
+			// printf("%.20Lfbb\n",cimagl(totalVal));
 		}
 		else
 		{
@@ -247,7 +260,13 @@ long double complex Bilangan()
 		getchar();
 		totalVal = 1 * I;
 	}
+	// printf("%.20Lfbb\n",creall(totalVal));
 	return round8(totalVal);
+}
+long double complex round8(long double complex input)
+{
+	return ((round(creall(input) * 100000000))/100000000) + ((round(cimagl(input) * 100000000))/100000000)*I;
+	// return (input);
 }
 
 char peek()
